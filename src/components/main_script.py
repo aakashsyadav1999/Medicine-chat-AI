@@ -70,8 +70,7 @@ class MainScript:
             # Log the first 50 characters of the encoded image for debugging
             logging.info(f"Encoded image first 50 characters: {encoded_image[:50]}...")
             # Prepare model and content
-            model = Model()
-            model = model.model()
+            model = self.model.model()  # Correct method call
             # Ensure prompt is a valid string
             prompt_text = self.prompt.prompt_main()  # Correct method call
             if not isinstance(prompt_text, str):
