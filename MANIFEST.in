@@ -1,0 +1,7 @@
+include README.md
+include LICENSE
+include setup.py
+include requirements.txt
+recursive-include src *
+recursive-include models *
+recursive-include database *
