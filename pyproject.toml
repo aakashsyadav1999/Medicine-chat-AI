@@ -1,0 +1,26 @@
+[project]
+name = "your_project_name"
+version = "0.1.0"
+description = "Your project description"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Your Name", email = "your.email@example.com" }]
+
+# Correctly formatted dependencies
+dependencies = [
+    "virtualenv",
+    "google-generativeai",
+    "setuptools",
+    "pymssql",
+    "python-dotenv",
+    "pandas",
+    "tqdm",
+    "requests",
+    "pillow",
+    "pyodbc",
+    "google-cloud-aiplatform"
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
