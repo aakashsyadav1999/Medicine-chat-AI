@@ -1,0 +1,12 @@
+virtualenv
+google-generativeai
+setuptools
+pymssql
+python-dotenv
+pandas
+tqdm
+requests
+pillow
+pyodbc
+google-cloud-aiplatform
+python-dotenv
