@@ -1,7 +1,7 @@
 import os
 
 list_of_files = [
-    
+
     'setup.py',
     'requirements.txt',
     'README.md',
@@ -28,6 +28,11 @@ list_of_files = [
     'database/config.yml',
     'src/exception/__init__.py',
     'src/logger/__init__.py',
+    'src/pipeline/__init__.py',
+    'src/pipeline/flow_pipeline.py',
+    'src/components/__init__.py',
+    'src/entity/__init__.py',
+    'src/entity/entity.py',
 ]
 
 
@@ -42,7 +47,7 @@ def create_files():
             print(f'Created {file}')
         else:
             print(f'{file} already exists')
-            
+
 
 def main():
     create_files()
