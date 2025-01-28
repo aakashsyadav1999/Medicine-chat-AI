@@ -1,0 +1,16 @@
+"""Pinecone Vector Database Configuration"""
+
+# Index configuration
+PINECONE_INDEX_NAME : medicine-vector-database
+
+# Vector configuration
+PINECONE_DIMENSION : 1536
+
+# Metric configuration
+PINECONE_METRIC : cosine
+
+# Cloud configuration
+PINECONE_CLOUD : aws
+
+# Region configuration
+PINECONE_REGION : us-east-1
