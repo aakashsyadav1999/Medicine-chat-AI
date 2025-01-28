@@ -1,4 +1,31 @@
-model : 'gemini-2.0-flash-exp'
-tempreture : 0.0
+"""Gemini Configurations"""
+
+# Model Configuration
+MODEL : os.getenv("GEMINI_MODEL_NAME")
+
+# Temperature Configuration
+TEMPERATURE : os.getenv("GEMINI_TEMPERATURE")
+
+# Max Length Configuration
+MAX_LENGTH : os.getenv("GEMINI_MAX_LENGTH")
+
+# TOP-K Configuration
+TOP_K : os.getenv("GEMINI_TOP_K")
+
+# TOP-P Configuration
+TOP_P : os.getenv("GEMINI_TOP_P")
+
+# Repetition Penalty Configuration
+REPETITION_PENALTY : os.getenv("GEMINI_REPETITION_PENALTY")
+
+# Num Return Sequences Configuration
+NUM_RETURN_SEQUENCE : os.getenv("GEMINI_NUM_RETURN_SEQUENCE")
+
+# Stop Token Configuration
+STOP_TOKEN : os.getenv("GEMINI_STOP_TOKEN")
+
+# Device Configuration
+DEVICE : os.getenv("GEMINI_DEVICE")
+
 
 
