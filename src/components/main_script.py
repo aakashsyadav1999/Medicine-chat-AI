@@ -59,7 +59,7 @@ class MainScript:
     def llm_call(self):
         try:
             # Path to the image
-            image_path = r"D:\vscode\Medicine-chat-AI\photos\IMG-20250125-WA0005.jpg"  # Replace with actual image path
+            image_path = r"D:\vscode\Medicine-chat-AI\photos\20250127_194229.jpg"  # Replace with actual image path
             # Prepare the image
             encoded_image = self.encode_image(image_path)
             # Check if the image is valid
