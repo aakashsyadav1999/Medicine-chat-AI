@@ -14,6 +14,8 @@ from src.prompts.prompts import Prompt
 from src.logger import logging
 from src.exception import CustomException
 import json
+from src.components.database import Database
+from src.components.agents import MyAgent
 
 
 
@@ -25,6 +27,7 @@ class MainScript:
         self.logging.info('MainScript object created')
         self.model = Model()
         self.prompt = Prompt()
+        self.agent = MyAgent()
 
     def run(self):
         self.logging.info('MainScript run method called')
@@ -56,35 +59,35 @@ class MainScript:
             logging.error(f"Image file not found: {e}")
 
 
-    def llm_call(self):
+    # Function to decode the image
+    def llm_call(self, call_agent=True):
         try:
             # Path to the image
-            image_path = r"D:\vscode\Medicine-chat-AI\photos\20250127_194229.jpg"  # Replace with actual image path
+            image_path = r"D:\vscode\Medicine-chat-AI\photos\20250127_194229.jpg"
             # Prepare the image
             encoded_image = self.encode_image(image_path)
-            # Check if the image is valid
+
             if not encoded_image:
                 logging.error("Encoded image is empty")
                 return
 
-            # Log the first 50 characters of the encoded image for debugging
             logging.info(f"Encoded image first 50 characters: {encoded_image[:50]}...")
+
             # Prepare model and content
-            model = self.model.model()  # Correct method call
-            # Ensure prompt is a valid string
-            prompt_text = self.prompt.prompt_main()  # Correct method call
+            model = self.model.model()
+            prompt_text = self.prompt.prompt_main()
+
             if not isinstance(prompt_text, str):
                 logging.error("Prompt text is invalid")
                 return
 
-            content_parts = [
-                {'text': prompt_text},
-                {'inline_data': {'mime_type': 'image/jpeg', 'data': encoded_image}}
-            ]
-            # Verify content_parts before sending to the model
-            if not content_parts or not isinstance(content_parts, list):
-                logging.error("content_parts is not a valid list or is empty")
-            # Generate response
+            content_parts = [{'text': prompt_text}, {'inline_data': {'mime_type': 'image/jpeg', 'data': encoded_image}}]
+
+            if not content_parts:
+                logging.error("Content parts list is empty or invalid")
+                return
+
+            # Generate initial response
             generate_request = {
                 'contents': [{'parts': content_parts}],
                 'stream': True,
@@ -95,16 +98,67 @@ class MainScript:
                     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
                 ]
             }
-            # Call generate method
-            response = model.generate_content(**generate_request, generation_config={"response_mime_type": "application/json"})
-            response.resolve()
-            #final_response
-            final_response = response.text
-            final_response_json = json.loads(final_response)
-            logging.info(f"Final response: {json.dumps(final_response_json, indent=4)}")
 
-        except ValueError as e:
-            logging.error(f"Image processing error: {e}")
+            response = model.generate_content(
+                **generate_request, generation_config={"response_mime_type": "application/json"}
+            )
+            response.resolve()
+            raw_response = response.text
+
+            try:
+                final_response_json = json.loads(raw_response)
+                print("Initial Response:", final_response_json)
+                logging.info(f"Final response: {json.dumps(final_response_json, indent=4)}")
+            except json.JSONDecodeError:
+                logging.error("Error parsing initial response as JSON.")
+                print(f"Raw response: {raw_response}")
+                return
+
+            # If agent is enabled, call the agent after initial output
+            if call_agent:
+                print("Calling agent...")
+                agent_message = {
+                    "role": "assistant",
+                    "content": {"parts": [{"text": json.dumps(final_response_json)}]}
+                }
+                self.agent.agent_call(agent_message)
+                return  # Exit after agent call
+
+            # Follow-up questions loop
+            previous_response = json.dumps(final_response_json)
+
+            while True:
+                follow_up_question = input("Enter your follow-up question (or 'exit' to quit): ")
+                if follow_up_question.lower() == 'exit':
+                    break
+
+                # Maintain context by combining previous response and the new question
+                context_text = f"Previously discussed: {previous_response}. Follow-up question: {follow_up_question}"
+
+                content_parts = [{"text": context_text}]
+                generate_request['contents'] = [{'parts': content_parts}]
+
+                try:
+                    response = model.generate_content(
+                        **generate_request, generation_config={"response_mime_type": "application/json"}
+                    )
+                    response.resolve()
+                    raw_response = response.text
+
+                    try:
+                        final_response_json = json.loads(raw_response)
+                        print("Follow-up Response:", final_response_json)
+                        logging.info(f"Follow-up response: {json.dumps(final_response_json, indent=4)}")
+                    except json.JSONDecodeError:
+                        logging.error("Error parsing follow-up response as JSON.")
+                        print(f"Raw follow-up response: {raw_response}")
+                        continue
+
+                    previous_response = json.dumps(final_response_json)
+
+                except Exception as e:
+                    logging.error(f"Unexpected error in follow-up API call: {e}")
+
         except Exception as e:
             logging.error(f"Unexpected error in API call: {e}")
 
