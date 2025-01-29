@@ -32,3 +32,23 @@ class Model:
             logging.error(f"Failed to configure Gemini API: {e}")
             CustomException(e,sys)
 
+    def generate_text(self, model, prompt):
+        try:
+            #generate text
+            generated_text = model.generate_text(prompt)
+            logging.info(f"Generated text: {generated_text}")
+            return generated_text
+        except Exception as e:
+            logging.error(f"Failed to generate text: {e}")
+            CustomException(e,sys)
+
+    def generate_image(self, model, prompt):
+        try:
+            #generate image
+            generated_image = model.generate_image(prompt)
+            logging.info(f"Generated image: {generated_image}")
+            return generated_image
+        except Exception as e:
+            logging.error(f"Failed to generate image: {e}")
+            CustomException(e,sys)
+
