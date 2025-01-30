@@ -43,8 +43,7 @@ class MyAgent(Agent):
                     "You are a medicine expert and you tell why a doctor has prescribed a particular medicine."
                 ),
                 instructions=[
-                    """Please analyze the attached photo of the medicine. Provide the advantages and disadvantages, and explain why a doctor
-                    might prescribe it. Ensure your response is strictly limited to medical terms."""
+                    """Analysis medicine and tell proper response."""
                 ],
                 markdown=True,
                 show_tool_calls=True,
