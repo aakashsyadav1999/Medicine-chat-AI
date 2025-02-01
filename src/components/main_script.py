@@ -1,11 +1,7 @@
 import os
 import sys
-import shutil
-import PIL.Image
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
-from PIL import Image, UnidentifiedImageError
-from io import BytesIO
 import base64
 
 # Add the project root to the system path
