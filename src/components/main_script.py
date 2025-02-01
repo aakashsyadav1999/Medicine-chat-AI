@@ -144,73 +144,80 @@ class MainScript:
             print(f"Raw response: {raw_response}")
             return None
 
-    def handle_initial_response(self, final_response_json, conversation_memory):
-        # Append the assistant's response to the conversation memory
-        conversation_memory.append({"role": "assistant", "content": json.dumps(final_response_json)})
-
-        call_agent_flag = final_response_json.get("use_tool", False)
-
-        if call_agent_flag:
-            print("LLM suggested calling agent for further information.")
-
-            # Extract the medicine name or default to a generic query
-            medicine_name = final_response_json.get("proper_name", "general query")
-            agent_message = {"role": "assistant", "content": medicine_name}
-
-            # Trigger the agent for initial query
-            self.agent.agent_call(agent_message)
-            print("Agent response complete.\n")
-
-            # Handle follow-up questions via agent
-            while True:
-                follow_up_question = input("Enter your follow-up question (or 'exit' to quit): ")
-                if follow_up_question.lower() == 'exit':
-                    break
-
-                # Redirect follow-up to agent instead of LLM
-                follow_up_agent_message = {"role": "assistant", "content": follow_up_question}
-                self.agent.agent_call(follow_up_agent_message)
-                print("Agent response complete.\n")
-
     def handle_follow_up_questions(self, conversation_memory):
-        conversation_memory.append({"role": "system", "content": "You are a helpful assistant."})
         while True:
             follow_up_question = input("Enter your follow-up question (or 'exit' to quit): ")
-            if follow_up_question.lower() == 'exit':
+            if follow_up_question.lower() == "exit":
                 break
 
             conversation_memory.append({"role": "user", "content": follow_up_question})
-            self.process_follow_up(conversation_memory)
+
+            # Example condition for using tool
+            use_tool = "web" in follow_up_question.lower() or "internet" in follow_up_question.lower()
+
+            if use_tool:
+                print("Triggering agent for follow-up question...")
+                self.trigger_agent(follow_up_question, conversation_memory)
+            else:
+                self.process_follow_up(conversation_memory)
+
+    def handle_initial_response(self, final_response_json, conversation_memory):
+        try:
+            print("Handling Initial Response...")
+            print("Initial Response:", json.dumps(final_response_json, indent=4))
+            conversation_memory.append({"role": "assistant", "content": str(final_response_json)})
+        except Exception as e:
+            logging.error(f"Error handling initial response: {e}")
+            print(f"Error handling initial respError during agent callonse: {e}")
+
+    def trigger_agent(self, query, conversation_memory):
+        try:
+            # Append user query to memory
+            conversation_memory.append({"role": "user", "content": query})
+
+            # Pass full conversation memory to the agent
+            response = self.agent.agent_call(conversation_memory)
+            print("Agent response from main file:", response)
+
+            # # Check if the response is None
+            if response is None:
+                print("Error: No response from agent.")
+                logging.error("Error: No response from agent.")
+                return
+
+            # # Safely get content from response (if it exists)
+            agent_content = response
+            # Check if agent_content is empty or None
+            if not agent_content:
+                print("Error: Agent response content is empty or None.")
+                logging.error("Error: Agent response content is empty or None.")
+                return
+
+            print("Agent response:", agent_content)
+
+            # Save the agent response back to memory
+            conversation_memory.append({"role": "assistant", "content": agent_content})
+
+        except Exception as e:
+            print(f"Error during agent call: {e}")
+            logging.error(f"Error during agent call: {e}")
 
     def process_follow_up(self, conversation_memory):
         try:
-            for message in conversation_memory:
-                if not isinstance(message.get("content"), str):
-                    message["content"] = json.dumps(message["content"])
-
             response = client.chat.completions.create(
                 messages=conversation_memory,
                 temperature=0.4,
                 model="gpt-4o-mini",
+                timeout=30
             )
-
-            raw_response = response.choices[0].message.content.strip()
-            print(f"Follow-up Answer: {raw_response}")
-
-            # Append assistant response to conversation
-            conversation_memory.append({"role": "assistant", "content": raw_response})
-
-            # Detect if user asks for Google search
-            if "search Google" in raw_response.lower() or "find information" in raw_response.lower():
-                print("Triggering agent search...")
-                search_query = input("Enter your search query: ")
-                if search_query.strip():
-                    agent_message = {"role": "assistant", "content": search_query}
-                    self.agent.agent_call(agent_message)
-
+            if response.choices:
+                raw_response = response.choices[0].message.content.strip()
+                print(f"Follow-up Answer: {raw_response}")
+                conversation_memory.append({"role": "assistant", "content": raw_response})
+            else:
+                print("No valid response received from LLM.")
         except Exception as e:
-            logging.error(f"OpenAI API Error: {e}")
-            print(f"OpenAI API Error: {e}")
+            print(f"Unexpected Error: {e}")
 
 
 
