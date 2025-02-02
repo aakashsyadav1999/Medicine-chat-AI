@@ -49,8 +49,8 @@ Medicine Chat AI is a Streamlit-based application designed to assist with medici
 ## Project Structure
 
 - `app.py`: The main entry point for the Streamlit application.
-![Medical Chat UI](documents-photos\app_interface.png)
-![Medical Chat UI INFO](documents-photos\app_button_info.png)
+![Medical Chat UI](documents-photos/app_interface.png)
+![Medical Chat UI INFO](documents-photos/app_button_info.png)
 - `src/components/main_script.py`: Contains the `MainScript` class which handles the core functionalities such as image encoding and API calls.
 - `src/components/models.py`: Defines the models used in the application.
 - `src/prompts/prompts.py`: Contains the prompt templates used for generating responses.
