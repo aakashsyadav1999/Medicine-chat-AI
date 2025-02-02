@@ -23,4 +23,5 @@ duckduckgo-search
 lxml_html_clean
 openai
 ipywidgets
+streamlit
 
