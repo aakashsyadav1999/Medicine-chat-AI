@@ -1,6 +1,6 @@
 # Medicine Chat AI
 
-Medicine Chat AI is a Streamlit-based application designed to assist with medicine-related queries. The application leverages OpenAI's language model to provide intelligent responses and can analyze images uploaded by the user.
+Medicine Chat AI is a Streamlit app that assists with medicine-related queries. It analyzes uploaded images, provides intelligent responses, and enables interactive chats about medicines, leveraging AI agents for enhanced insights.
 
 ## Features
 
