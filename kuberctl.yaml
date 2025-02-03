@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streamlit-app-deployment
+  labels:
+    app: streamlit-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: streamlit-app
+  template:
+    metadata:
+      labels:
+        app: streamlit-app
+    spec:
+      containers:
+      - name: streamlit-app
+        image: aakashsyadav1999/medicine-chat-ai:latest
+        ports:
+        - containerPort: 8501
+        envFrom:
+        - secretRef:
+            name: streamlit-env  # Use the Secret we created
+      imagePullSecrets:
+        - name: my-registry-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: streamlit-app-service
+spec:
+  selector:
+    app: streamlit-app
+  ports:
+    - protocol: TCP
+      port: 80 # Port exposed externally
+      targetPort: 8501 # Port the app runs on inside the container
+  type: LoadBalancer
